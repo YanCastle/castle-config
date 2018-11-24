@@ -13,6 +13,7 @@ export default class DefaultConfig {
     protected _ctx: any;
     constructor(ctx: any, ) {
         this._ctx = ctx;
+        hook.emit(ConfigHooks.NEW_CONFIG, ctx, this)
     }
     /**
      * get App Debug Status
@@ -186,6 +187,7 @@ export class RouterPath {
 }
 
 export enum ConfigHooks {
+    NEW_CONFIG = 'NEW_CONFIG',
     START_TRANS = 'START_TRANS',
     COMMIT_TRANS = 'COMMIT_TRANS',
     ROLLBACK_TRANS = 'ROLLBACK_TRANS',
