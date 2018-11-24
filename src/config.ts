@@ -2,7 +2,7 @@ import { env } from 'process'
 import { MD5 } from 'castle-crypto'
 import * as Sequelize from 'sequelize'
 import { resolve, join } from 'path';
-
+import hook from './hook'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -96,6 +96,7 @@ export default class DefaultConfig {
      */
     async startTrans() {
         this._transTimes++;
+        hook.emit(ConfigHooks.START_TRANS, this._ctx, this)
         if (!this._trans) {
             this._trans = await (await this.getSequelizeDb()).transaction()
         }
@@ -106,6 +107,7 @@ export default class DefaultConfig {
      */
     async commit() {
         this._transTimes--
+        hook.emit(ConfigHooks.COMMIT_TRANS, this._ctx, this)
         if (this._trans && this._transTimes == 0) {
             await this._trans.commit()
             this._trans = undefined;
@@ -117,6 +119,7 @@ export default class DefaultConfig {
      */
     async rollback() {
         this._transTimes--
+        hook.emit(ConfigHooks.ROLLBACK_TRANS, this._ctx, this)
         if (this._trans) {
             await this._trans.rollback()
         }
@@ -174,9 +177,16 @@ export default class DefaultConfig {
         }
         return new RouterPath
     }
+
 }
 export class RouterPath {
     Module: string = '';
     Method: string = "";
     Controller: string = "";
+}
+
+export enum ConfigHooks {
+    START_TRANS = 'START_TRANS',
+    COMMIT_TRANS = 'COMMIT_TRANS',
+    ROLLBACK_TRANS = 'ROLLBACK_TRANS',
 }
