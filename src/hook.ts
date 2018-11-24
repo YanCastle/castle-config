@@ -64,7 +64,7 @@ class Hook {
             asyncs.push(Hooks[Where].Async[hooks[i]](Ctx, Data))
         }
         let syncHooks = Object.keys(Hooks[Where].Sync);
-        for (let i = 0; i < hooks.length; i++) {
+        for (let i = 0; i < syncHooks.length; i++) {
             await Hooks[Where].Sync[syncHooks[i]](Ctx, Data)
         }
         return true;
