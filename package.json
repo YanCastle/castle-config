@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/YanCastle/castle-config",
-  "author": "CastleMY <490523604@qq.com>",
+  "author": "yanpengquan",
   "license": "MIT",
   "files": [
     "dist/**/*.js",
@@ -12,11 +12,13 @@
     "yarn.lock"
   ],
   "devDependencies": {
+    "@types/koa": "^2.0.47",
     "@types/node": "^10.12.10",
     "@types/sequelize": "^4.27.31"
   },
   "dependencies": {
     "castle-crypto": "^1.0.1",
+    "koa": "^2.6.2",
     "sequelize": "^4.41.2"
   }
 }
