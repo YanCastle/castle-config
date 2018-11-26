@@ -33,6 +33,12 @@ class Hook {
         return true;
     }
     /**
+     * 获取所有hook内容
+     */
+    get Hooks() {
+        return Hooks;
+    }
+    /**
      * 反注册Hook事件
      * @param Where 
      * @param HookID 
