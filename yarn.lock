@@ -177,6 +177,11 @@ castle-crypto@^1.0.1:
   dependencies:
     "@types/node" "^10.12.5"
 
+castle-utils@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/castle-utils/-/castle-utils-1.0.2.tgz#86b26ea3bf809c6797c032c0724af7522ed59ccf"
+  integrity sha512-xivht63kaRpGalmorgQw8ZxbiVUhXqHdw61LAqInsw7qme9WxCgu4Ds2j5sj5vrKavKEoaJikqnmJpmqQ/cMuA==
+
 cls-bluebird@^2.1.0:
   version "2.1.0"
   resolved "http://registry.npm.taobao.org/cls-bluebird/download/cls-bluebird-2.1.0.tgz#37ef1e080a8ffb55c2f4164f536f1919e7968aee"

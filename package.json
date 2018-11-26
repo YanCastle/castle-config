@@ -1,11 +1,11 @@
 {
   "name": "castle-config",
   "version": "1.0.2",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",

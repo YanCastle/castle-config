@@ -3,6 +3,8 @@ import { MD5 } from 'castle-crypto'
 import * as Sequelize from 'sequelize'
 import { resolve, join } from 'path';
 import hook from './hook'
+import { Context } from 'koa';
+import { uuid } from 'castle-utils'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -10,7 +12,7 @@ const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
  * 默认配置文件信息
  */
 export default class DefaultConfig {
-    protected _ctx: any;
+    protected _ctx: Context;
     constructor(ctx: any, ) {
         this._ctx = ctx;
         hook.emit(ConfigHooks.NEW_CONFIG, ctx, this)
@@ -33,6 +35,20 @@ export default class DefaultConfig {
      */
     async getAppPath(): Promise<string> {
         return 'dist';
+    }
+    /**
+     * 获取新的SessionID
+     */
+    async getNewSessionID() {
+        let value = uuid('session')
+        this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
+        return value;
+    }
+    /**
+     * 获取SessionID
+     */
+    async getSessionID() {
+        return this._ctx.cookies.get((await this.getSessionConfig()).Config.key);
     }
     /**
      * 获取session配置信息
