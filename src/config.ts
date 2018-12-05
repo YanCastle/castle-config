@@ -4,7 +4,7 @@ import * as Sequelize from 'sequelize'
 import { resolve, join } from 'path';
 import hook from './hook'
 import { Context } from 'koa';
-import { uuid } from 'castle-utils'
+import { uuid } from './utils';
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -15,7 +15,6 @@ export default class DefaultConfig {
     protected _ctx: Context;
     constructor(ctx: any, ) {
         this._ctx = ctx;
-        hook.emit(ConfigHooks.NEW_CONFIG, ctx, this)
     }
     /**
      * get App Debug Status
@@ -23,7 +22,6 @@ export default class DefaultConfig {
     async getAppDebug(): Promise<boolean> {
         return env.NODE_ENV == 'production';
     }
-
     /**
      * get Static Path ,
      */
@@ -41,7 +39,11 @@ export default class DefaultConfig {
      */
     async getNewSessionID() {
         let value = uuid('session')
-        this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
+        try {
+            // this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
+        } catch (error) {
+
+        }
         return value;
     }
     /**
@@ -50,6 +52,19 @@ export default class DefaultConfig {
     async getSessionID() {
         return this._ctx.cookies.get((await this.getSessionConfig()).Config.key);
     }
+    protected _sessionConfig = {
+        Driver: 'default',
+        Config: {
+            key: 'castlekoa',
+            path: '.sess',
+            maxAge: 86400000,
+            overwrite: true, /** (boolean) can overwrite or not (default true) */
+            httpOnly: true, /** (boolean) httpOnly or not (default true) */
+            signed: true, /** (boolean) signed or not (default true) */
+            rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */
+            renew: false, /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/
+        }
+    };
     /**
      * 获取session配置信息
      */
@@ -57,19 +72,7 @@ export default class DefaultConfig {
         Driver: any,
         Config: any
     }> {
-        return {
-            Driver: 'default',
-            Config: {
-                key: 'castlekoa',
-                path: '.sess',
-                maxAge: 86400000,
-                overwrite: true, /** (boolean) can overwrite or not (default true) */
-                httpOnly: true, /** (boolean) httpOnly or not (default true) */
-                signed: true, /** (boolean) signed or not (default true) */
-                rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */
-                renew: false, /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/
-            }
-        }
+        return this._sessionConfig;
     }
     /**
      * 获取数据库配置
@@ -87,6 +90,18 @@ export default class DefaultConfig {
                 pool: { max: 5, min: 1, acquire: 3000, idle: 1000 },
                 logging: (await this.getAppDebug()) ? console.log : false
             },
+        }
+    }
+    /**
+     * 输出格式化
+     * @param ctx 
+     */
+    async outcheck(ctx: Context) {
+        return {
+            d: this._ctx.body !== undefined ? this._ctx.body : '',
+            c: this._ctx.error ? 500 : 200,
+            i: this._ctx.control ? [this._ctx.control.c, this._ctx.control.m].join('/') : '',
+            e: this._ctx.error ? this._ctx.error : ''
         }
     }
     /**
