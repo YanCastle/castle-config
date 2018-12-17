@@ -1,10 +1,11 @@
 import { env } from 'process'
 import { MD5 } from 'castle-crypto'
 import * as Sequelize from 'sequelize'
-import { resolve, join } from 'path';
-import hook from './hook'
+import { resolve, join, extname } from 'path';
+import hook, { HookWhen } from 'castle-hook'
 import { Context } from 'koa';
 import { uuid } from './utils';
+import * as send from 'koa-send'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -13,25 +14,26 @@ const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
  */
 export default class DefaultConfig {
     protected _ctx: Context;
+    sendFile: boolean = false;
     constructor(ctx: any, ) {
         this._ctx = ctx;
     }
     /**
      * get App Debug Status
      */
-    async getAppDebug(): Promise<boolean> {
+    getAppDebug(): boolean {
         return env.NODE_ENV == 'production';
     }
     /**
      * get Static Path ,
      */
-    async getStaticPath(): Promise<string> {
+    getStaticPath(): string {
         return 'Public';
     }
     /**
      * 获取应用地址
      */
-    async getAppPath(): Promise<string> {
+    getAppPath(): string {
         return 'dist';
     }
     /**
@@ -97,11 +99,14 @@ export default class DefaultConfig {
      * @param ctx 
      */
     async outcheck(ctx: Context) {
-        return {
+        // if (!this.sendFile)
+        return this.sendFile ? undefined : {
             d: this._ctx.body !== undefined ? this._ctx.body : '',
-            c: this._ctx.error ? 500 : 200,
-            i: this._ctx.control ? [this._ctx.control.c, this._ctx.control.m].join('/') : '',
-            e: this._ctx.error ? this._ctx.error : ''
+            c: this._ctx.error ? (ctx.status != 200 ? ctx.status : 500) : 200,
+            i: this._ctx.control ? [this._ctx.control.Module, this._ctx.control.Controller, this._ctx.control.Method].join('/') : '',
+            e: this._ctx.error ? {
+                m: this._ctx.error.message ? this._ctx.error.message : this._ctx.error
+            } : ''
         }
     }
     /**
@@ -128,10 +133,11 @@ export default class DefaultConfig {
      */
     async startTrans() {
         this._transTimes++;
-        hook.emit(ConfigHooks.START_TRANS, this._ctx, this)
+        hook.emit(ConfigHooks.START_TRANS, HookWhen.Before, this._ctx, this)
         if (!this._trans) {
             this._trans = await (await this.getSequelizeDb()).transaction()
         }
+        hook.emit(ConfigHooks.START_TRANS, HookWhen.After, this._ctx, this)
         return this._trans;
     }
     /**
@@ -139,11 +145,12 @@ export default class DefaultConfig {
      */
     async commit() {
         this._transTimes--
-        hook.emit(ConfigHooks.COMMIT_TRANS, this._ctx, this)
+        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans && this._transTimes == 0) {
             await this._trans.commit()
             this._trans = undefined;
         }
+        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**
@@ -151,20 +158,21 @@ export default class DefaultConfig {
      */
     async rollback() {
         this._transTimes--
-        hook.emit(ConfigHooks.ROLLBACK_TRANS, this._ctx, this)
+        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans) {
             await this._trans.rollback()
         }
+        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**
      * 获取数据库结构定义文件
      * @param TableName 
      */
-    async getDbDefine(TableName: string) {
+    getDbDefine(TableName: string) {
         //加载文件
         try {
-            let d = require(resolve(join(await this.getAppPath(), 'db', TableName)))
+            let d = require(resolve(join(this.getAppPath(), 'db', TableName)))
             return d.default
         } catch (e) {
             throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
@@ -174,13 +182,16 @@ export default class DefaultConfig {
      * 获取数据库的主键
      * @param TableName 
      */
-    async getDbPK(TableName: string) {
-        let define = await this.getDbDefine(TableName);
+    getDbTablePK(TableName: string) {
+        let define = this.getDbDefine(TableName);
         let keys = Object.keys(define);
         for (let i = 0; i < keys.length; i++) {
             if (define[keys[i]].primaryKey) { return keys[i]; }
         }
         throw new Error(`NO_PK:${TableName}`)
+    }
+    getDbTableFields(TableName: string): Promise<any> {
+        return this.getDbDefine(TableName)
     }
     /**
      * 是否允许CORS跨域
@@ -195,21 +206,37 @@ export default class DefaultConfig {
         return false;
     }
     /**
+     * 动态缓存目录
+     */
+    Dynamic: string[] = []
+    /**
      * 生成控制器规则
      */
     async getController(): Promise<RouterPath> {
-        let path = this._ctx.path.split('/');
-        if (path.length > 1) {
-            if (path[0] == "" && path.length > 2) { path.shift() }
+        let p = this._ctx.path.split('/');
+        if (this._ctx.method == "GET" && extname(this._ctx.path) && !this.Dynamic.includes(p[0])) {
+            this.sendFile = true;
+        }
+        if (p.length > 1) {
+            if (p[0] == "" && p.length > 2) { p.shift() }
             return {
                 Module: '',
-                Controller: path[0],
-                Method: path.length == 1 ? 'index' : path[1],
+                Controller: p[0],
+                Method: p.length == 1 ? 'index' : p[1],
             };
         }
         return new RouterPath
     }
-
+    /**
+     * 静态文件处理
+     */
+    async getStaticFile() {
+        return await send(this._ctx, this._ctx.path, {
+            root: await this.getStaticPath(),
+            index: 'index.html',
+            maxage: 86400000,
+        })
+    }
 }
 export class RouterPath {
     Module: string = '';
