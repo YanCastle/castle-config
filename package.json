@@ -1,6 +1,6 @@
 {
   "name": "castle-config",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
@@ -9,17 +9,24 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "yarn.lock"
+    "yarn.lock",
+    "READMD.md"
   ],
   "devDependencies": {
     "@types/koa": "^2.0.47",
+    "@types/koa-send": "^4.1.1",
     "@types/node": "^10.12.10",
     "@types/sequelize": "^4.27.31"
   },
   "dependencies": {
+    "castle-config": "^1.0.5",
     "castle-crypto": "^1.0.1",
+    "castle-hook": "^1.0.1",
     "castle-utils": "^1.0.2",
     "koa": "^2.6.2",
+    "koa-send": "^5.0.0",
+    "mysql2": "^1.6.4",
+    "mz": "^2.7.0",
     "sequelize": "^4.41.2"
   }
 }
