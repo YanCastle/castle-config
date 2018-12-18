@@ -79,7 +79,7 @@ export default class DefaultConfig {
     /**
      * 获取数据库配置
      */
-    async getDbConfig() {
+    async getDbConfig(): Promise<{ database: string, username: string, password: string, options?: any }> {
         return {
             database: 'test',
             username: 'root',
@@ -98,7 +98,7 @@ export default class DefaultConfig {
      * 输出格式化
      * @param ctx 
      */
-    async outcheck(ctx: Context) {
+    async outcheck(ctx: Context): Promise<any> {
         // if (!this.sendFile)
         return this.sendFile ? undefined : {
             d: this._ctx.body !== undefined ? this._ctx.body : '',
@@ -112,7 +112,7 @@ export default class DefaultConfig {
     /**
      * 获取Sequence数据库实例
      */
-    async getSequelizeDb() {
+    async getSequelizeDb(): Promise<Sequelize.Sequelize> {
         let config = await this.getDbConfig();
         let hash = MD5.encode(JSON.stringify(config));
         if (!SequelizeDBs[hash]) {
@@ -131,38 +131,38 @@ export default class DefaultConfig {
     /**
      * 开启事务
      */
-    async startTrans() {
+    async startTrans(): Promise<Sequelize.Transaction> {
         this._transTimes++;
-        hook.emit(ConfigHooks.START_TRANS, HookWhen.Before, this._ctx, this)
+        // hook.emit(ConfigHooks.START_TRANS, HookWhen.Before, this._ctx, this)
         if (!this._trans) {
             this._trans = await (await this.getSequelizeDb()).transaction()
         }
-        hook.emit(ConfigHooks.START_TRANS, HookWhen.After, this._ctx, this)
+        // hook.emit(ConfigHooks.START_TRANS, HookWhen.After, this._ctx, this)
         return this._trans;
     }
     /**
      * 提交事务
      */
-    async commit() {
+    async commit(): Promise<boolean> {
         this._transTimes--
-        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
+        // hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans && this._transTimes == 0) {
             await this._trans.commit()
             this._trans = undefined;
         }
-        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.After, this._ctx, this)
+        // hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**
      * 事务撤销
      */
-    async rollback() {
+    async rollback(): Promise<boolean> {
         this._transTimes--
-        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
+        // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans) {
             await this._trans.rollback()
         }
-        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
+        // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**

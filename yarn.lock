@@ -177,31 +177,6 @@ cache-content-type@^1.0.0:
     mime-types "^2.1.18"
     ylru "^1.2.0"
 
-castle-config@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/castle-config/-/castle-config-1.0.5.tgz#350e036c1e219aaaeed6e6ad69018137512e256c"
-  integrity sha512-QqCh12pEDdXd0caRUv2U6/rnkLaUBGKg8THEiGe16AP94ViOAgaT6iZLUq/hn4WNsRi+sbk5+nk5bCHXcy5zKw==
-  dependencies:
-    castle-crypto "^1.0.1"
-    castle-utils "^1.0.2"
-    koa "^2.6.2"
-    sequelize "^4.41.2"
-
-castle-config@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/castle-config/-/castle-config-1.0.6.tgz#de43b98460f47b64cf8a32f2367f28074b5ae681"
-  integrity sha512-iRdw3x9sIdkiUbD5Stefg+RYxApFqbcEiTNAITPOZWaJF/qN23/+TLV3nzma7oXIR0kyy5lk8iEhF8ptVEpPNw==
-  dependencies:
-    castle-config "^1.0.5"
-    castle-crypto "^1.0.1"
-    castle-hook "^1.0.1"
-    castle-utils "^1.0.2"
-    koa "^2.6.2"
-    koa-send "^5.0.0"
-    mysql2 "^1.6.4"
-    mz "^2.7.0"
-    sequelize "^4.41.2"
-
 castle-crypto@^1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/castle-crypto/download/castle-crypto-1.0.1.tgz#e015b8dbaf589e5af9b5d69b4607a4fb3b635ad9"
