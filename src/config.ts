@@ -42,7 +42,7 @@ export default class DefaultConfig {
     async getNewSessionID() {
         let value = uuid('session')
         try {
-            // this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
+            this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
         } catch (error) {
 
         }
