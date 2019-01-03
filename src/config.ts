@@ -124,6 +124,12 @@ export default class DefaultConfig {
      * 事务标识
      */
     protected _trans: Sequelize.Transaction | undefined;
+    get transaction() {
+        return this._trans;
+    }
+    get transactionTimes() {
+        return this._transTimes;
+    }
     /**
      * 事务层数
      */
@@ -161,6 +167,7 @@ export default class DefaultConfig {
         // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans && this._transTimes == 0) {
             await this._trans.rollback()
+            this._trans == undefined;
         }
         // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
         return true;
