@@ -165,7 +165,7 @@ export default class DefaultConfig {
     async rollback(): Promise<boolean> {
         this._transTimes--
         // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
-        if (this._trans && this._transTimes == 0) {
+        if (this._trans) {
             await this._trans.rollback()
             this._trans == undefined;
         }
