@@ -163,7 +163,7 @@ export default class DefaultConfig {
      * 事务撤销
      */
     async rollback(): Promise<boolean> {
-        this._transTimes--
+        this._transTimes = 0
         // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans) {
             await this._trans.rollback()
