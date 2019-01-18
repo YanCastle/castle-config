@@ -81,14 +81,14 @@ export default class DefaultConfig {
      */
     async getDbConfig(): Promise<{ database: string, username: string, password: string, options?: any }> {
         return {
-            database: 'test',
-            username: 'root',
-            password: '123456',
+            database: env.DB_NAME || 'test',
+            username: env.DB_USER || 'root',
+            password: env.DB_PWD || '123456',
             options: {
-                host: 'localhost',
-                port: 3306,
-                dialect: 'mysql',
-                timezone: '+8:00',
+                host: env.DB_HOST || 'localhost',
+                port: env.DB_PORT || 3306,
+                dialect: env.DB_DIALET || 'mysql',
+                timezone: env.DB_TIMEZONE || '+8:00',
                 pool: { max: 5, min: 1, acquire: 3000, idle: 1000 },
                 logging: (await this.getAppDebug()) ? console.log : false
             },
