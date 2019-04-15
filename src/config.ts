@@ -4,7 +4,7 @@ import * as Sequelize from 'sequelize'
 import { resolve, join, extname } from 'path';
 import hook, { HookWhen } from 'castle-hook'
 import { Context } from 'koa';
-import { uuid } from './utils';
+import { uuid } from '@ctsy/common';
 import * as send from 'koa-send'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
@@ -35,6 +35,12 @@ export default class DefaultConfig {
      */
     getAppPath(): string {
         return 'dist';
+    }
+    /**
+     * 获取Lib目录
+     */
+    getLibPath() {
+        return this._ctx.route && this._ctx.route.Path ? this._ctx.route.Path : this.getAppPath()
     }
     /**
      * 获取新的SessionID
@@ -179,7 +185,7 @@ export default class DefaultConfig {
     getDbDefine(TableName: string) {
         //加载文件
         try {
-            let d = require(resolve(join(this.getAppPath(), 'db', TableName)))
+            let d = require(resolve(join(this.getLibPath(), 'db', TableName)))
             return d.default
         } catch (e) {
             throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
@@ -217,6 +223,12 @@ export default class DefaultConfig {
      */
     Dynamic: string[] = []
     /**
+     * 模块映射关系
+     */
+    ModulesMap: { [index: string]: string } = {
+
+    }
+    /**
      * 生成控制器规则
      */
     async getController(): Promise<RouterPath> {
@@ -225,14 +237,23 @@ export default class DefaultConfig {
             this.sendFile = true;
         }
         if (p.length > 1) {
+            if (p[0].startsWith('_')) {
+                //模块模式
+                let mname = p[0].substr(1);
+                return this._ctx.route = Object.assign(new RouterPath, {
+                    Controller: p[1],
+                    Method: p.length == 2 ? 'index' : p[2],
+                    Path: this.ModulesMap[mname],
+                    Module: mname
+                })
+            }
             if (p[0] == "" && p.length > 2) { p.shift() }
-            return {
-                Module: '',
+            return this._ctx.route = Object.assign(new RouterPath, {
                 Controller: p[0],
                 Method: p.length == 1 ? 'index' : p[1],
-            };
+            })
         }
-        return new RouterPath
+        return this._ctx.route = new RouterPath
     }
     /**
      * 静态文件处理
@@ -245,12 +266,18 @@ export default class DefaultConfig {
         })
     }
 }
+/**
+ * 路径类
+ */
 export class RouterPath {
     Module: string = '';
     Method: string = "";
     Controller: string = "";
+    Path: string = "";
 }
-
+/**
+ * 配置Hook钩子
+ */
 export enum ConfigHooks {
     NEW_CONFIG = 'NEW_CONFIG',
     START_TRANS = 'START_TRANS',
