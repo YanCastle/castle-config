@@ -237,6 +237,7 @@ export default class DefaultConfig {
             this.sendFile = true;
         }
         if (p.length > 1) {
+            if (p[0] == "" && p.length > 2) { p.shift() }
             if (p[0].startsWith('_')) {
                 //模块模式
                 let mname = p[0].substr(1);
@@ -247,7 +248,6 @@ export default class DefaultConfig {
                     Module: mname
                 })
             }
-            if (p[0] == "" && p.length > 2) { p.shift() }
             return this._ctx.route = Object.assign(new RouterPath, {
                 Controller: p[0],
                 Method: p.length == 1 ? 'index' : p[1],
