@@ -232,26 +232,28 @@ export default class DefaultConfig {
      * 生成控制器规则
      */
     async getController(): Promise<RouterPath> {
-        let p = this._ctx.path.split('/');
-        if (this._ctx.method == "GET" && extname(this._ctx.path) && !this.Dynamic.includes(p[0])) {
-            this.sendFile = true;
-        }
-        if (p.length > 1) {
-            if (p[0] == "" && p.length > 2) { p.shift() }
-            if (p[0].startsWith('_')) {
-                //模块模式
-                let mname = p[0].substr(1);
+        if (this._ctx && this._ctx.path) {
+            let p = this._ctx.path.split('/');
+            if (this._ctx.method == "GET" && extname(this._ctx.path) && !this.Dynamic.includes(p[0])) {
+                this.sendFile = true;
+            }
+            if (p.length > 1) {
+                if (p[0] == "" && p.length > 2) { p.shift() }
+                if (p[0].startsWith('_')) {
+                    //模块模式
+                    let mname = p[0].substr(1);
+                    return this._ctx.route = Object.assign(new RouterPath, {
+                        Controller: p[1],
+                        Method: p.length == 2 ? 'index' : p[2],
+                        Path: this.ModulesMap[mname],
+                        Module: mname
+                    })
+                }
                 return this._ctx.route = Object.assign(new RouterPath, {
-                    Controller: p[1],
-                    Method: p.length == 2 ? 'index' : p[2],
-                    Path: this.ModulesMap[mname],
-                    Module: mname
+                    Controller: p[0],
+                    Method: p.length == 1 ? 'index' : p[1],
                 })
             }
-            return this._ctx.route = Object.assign(new RouterPath, {
-                Controller: p[0],
-                Method: p.length == 1 ? 'index' : p[1],
-            })
         }
         return this._ctx.route = new RouterPath
     }
