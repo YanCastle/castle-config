@@ -2,7 +2,6 @@ import { env } from 'process'
 import { MD5 } from 'castle-crypto'
 import * as Sequelize from 'sequelize'
 import { resolve, join, extname } from 'path';
-import hook, { HookWhen } from 'castle-hook'
 import { Context } from 'koa';
 import { uuid } from '@ctsy/common';
 import * as send from 'koa-send'
