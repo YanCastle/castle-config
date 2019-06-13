@@ -1,6 +1,6 @@
 {
   "name": "@ctsy/config",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
@@ -20,11 +20,12 @@
   },
   "dependencies": {
     "@ctsy/common": "^1.0.1",
+    "@ctsy/hook": "^0.0.2",
     "castle-crypto": "^1.0.1",
     "castle-utils": "^1.0.2",
     "koa": "^2.6.2",
     "koa-send": "^5.0.0",
     "mz": "^2.7.0",
-    "sequelize": "^5.8.9"
+    "sequelize": "4.43.0"
   }
 }
