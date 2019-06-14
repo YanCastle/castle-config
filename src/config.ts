@@ -45,11 +45,12 @@ export default class DefaultConfig {
      * 获取新的SessionID
      */
     async getNewSessionID() {
-        let value = uuid('session')
+        let value = uuid('session');
         try {
-            this._ctx.cookies.set((await this.getSessionConfig()).Config.key, value)
-        } catch (error) {
-
+            this._ctx.set('Token', value);
+            this._ctx.set('Access-Control-Expose-Headers', 'Token')
+        }
+        catch (error) {
         }
         return value;
     }
@@ -57,7 +58,7 @@ export default class DefaultConfig {
      * 获取SessionID
      */
     async getSessionID() {
-        return this._ctx.cookies.get((await this.getSessionConfig()).Config.key);
+        return this._ctx.get('Token');
     }
     protected _sessionConfig = {
         Driver: 'default',
