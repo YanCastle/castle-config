@@ -239,6 +239,7 @@ export default class DefaultConfig {
             }
             if (p.length > 1) {
                 if (p[0] == "" && p.length > 2) { p.shift() }
+                if (p[0] == 'api') { p.shift() }
                 if (p[0].startsWith('_')) {
                     //模块模式
                     let mname = p[0].substr(1);

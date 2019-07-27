@@ -19,10 +19,10 @@
     "@types/sequelize": "^4.28.3"
   },
   "dependencies": {
-    "@ctsy/common": "^1.0.1",
-    "@ctsy/hook": "^0.0.2",
-    "castle-crypto": "^1.0.1",
-    "castle-utils": "^1.0.2",
+    "@ctsy/common": "~1.0.1",
+    "@ctsy/hook": "~0.0.2",
+    "castle-crypto": "~1.0.1",
+    "castle-utils": "~1.0.2",
     "koa": "^2.6.2",
     "koa-send": "^5.0.0",
     "mz": "^2.7.0",
