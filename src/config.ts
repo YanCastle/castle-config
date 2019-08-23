@@ -95,7 +95,7 @@ export default class DefaultConfig {
                 port: env.DB_PORT || 3306,
                 dialect: env.DB_DIALET || 'mysql',
                 timezone: env.DB_TIMEZONE || '+8:00',
-                pool: { max: 5, min: 1, acquire: 3000, idle: 1000 },
+                pool: { max: 5, min: 1, acquire: 300000, idle: 1000 },
                 logging: (await this.getAppDebug()) ? console.log : false
             },
         }
