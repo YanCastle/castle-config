@@ -122,7 +122,11 @@ export default class DefaultConfig {
         let config = await this.getDbConfig();
         let hash = MD5.encode(JSON.stringify(config));
         if (!SequelizeDBs[hash]) {
-            SequelizeDBs[hash] = new Sequelize(config.database, config.username, config.password, config.options);
+            if (config.options && config.options.dialect == 'tablestore') {
+                SequelizeDBs[hash] = new (require('@ctsy/aliyun-tablestore').default)(config.database, config.username, config.password, config.options)
+            } else {
+                SequelizeDBs[hash] = new Sequelize(config.database, config.username, config.password, config.options);
+            }
         }
         return SequelizeDBs[hash];
     }
