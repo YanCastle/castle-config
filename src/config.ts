@@ -1,5 +1,5 @@
 import { env } from 'process'
-import { MD5 } from 'castle-crypto'
+import { MD5 } from '@ctsy/crypto'
 import * as Sequelize from 'sequelize'
 import { resolve, join, extname } from 'path';
 import { Context } from 'koa';
@@ -58,7 +58,7 @@ export default class DefaultConfig {
      * 获取SessionID
      */
     async getSessionID() {
-        return this._ctx.get('Token');
+        return this._ctx.get('Token') || this._ctx.cookies.get('Token');
     }
     protected _sessionConfig = {
         Driver: 'default',
@@ -125,7 +125,7 @@ export default class DefaultConfig {
             if (config.options && config.options.dialect == 'tablestore') {
                 SequelizeDBs[hash] = new (require('@ctsy/aliyun-tablestore').default)(config.database, config.username, config.password, config.options)
             } else {
-                SequelizeDBs[hash] = new Sequelize(config.database, config.username, config.password, config.options);
+                SequelizeDBs[hash] = new Sequelize.Sequelize(config.database, config.username, config.password, config.options);
             }
         }
         return SequelizeDBs[hash];
@@ -133,7 +133,7 @@ export default class DefaultConfig {
     /**
      * 事务标识
      */
-    protected _trans: Sequelize.Transaction | undefined;
+    protected _trans?: Sequelize.Transaction;
     get transaction() {
         return this._trans;
     }
@@ -149,12 +149,7 @@ export default class DefaultConfig {
      */
     async startTrans(): Promise<Sequelize.Transaction> {
         this._transTimes++;
-        // hook.emit(ConfigHooks.START_TRANS, HookWhen.Before, this._ctx, this)
-        if (!this._trans) {
-            this._trans = await (await this.getSequelizeDb()).transaction()
-        }
-        // hook.emit(ConfigHooks.START_TRANS, HookWhen.After, this._ctx, this)
-        return this._trans;
+        return this._trans ? this._trans : await (await this.getSequelizeDb()).transaction();
     }
     /**
      * 提交事务
