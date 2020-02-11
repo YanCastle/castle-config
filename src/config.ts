@@ -143,13 +143,16 @@ export default class DefaultConfig {
     /**
      * 事务层数
      */
-    protected _transTimes: number = 0;
+    public _transTimes: number = 0;
     /**
      * 开启事务
      */
     async startTrans(): Promise<Sequelize.Transaction> {
         this._transTimes++;
-        return this._trans ? this._trans : await (await this.getSequelizeDb()).transaction();
+        if(this._trans){
+            return this._trans
+        }
+        return this._trans = await (await this.getSequelizeDb()).transaction();
     }
     /**
      * 提交事务
