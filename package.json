@@ -1,6 +1,6 @@
 {
   "name": "@ctsy/config",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
@@ -14,21 +14,21 @@
   ],
   "scripts": {},
   "devDependencies": {
-    "@types/koa": "^2.0.47",
-    "@types/koa-send": "^4.1.1",
-    "@types/node": "^10.12.10",
-    "@types/validator": "^12.0.1"
+    "@types/koa": "~2.0.47",
+    "@types/koa-send": "~4.1.1",
+    "@types/node": "~10.12.10",
+    "@types/validator": "~12.0.1"
   },
   "dependencies": {
-    "@ctsy/common": "^1.0.1",
-    "@ctsy/crypto": "^1.0.9",
-    "@ctsy/hook": "^0.0.5",
-    "@ctsy/model": "^2.0.0",
-    "castle-utils": "~1.0.2",
-    "koa": "^2.6.2",
-    "koa-send": "^5.0.0",
-    "mysql2": "^2.0.1",
-    "mz": "^2.7.0",
-    "sequelize": "^5.21.2"
+    "@ctsy/common": "~1.0",
+    "@ctsy/crypto": "~1.0",
+    "@ctsy/hook": "~0.0",
+    "@ctsy/model": "~2.0",
+    "castle-utils": "~1.0",
+    "koa": "~2.6.2",
+    "koa-send": "~5.0.0",
+    "mysql2": "~2.0",
+    "mz": "~2.7.0",
+    "sequelize": "~5.21.2"
   }
 }
