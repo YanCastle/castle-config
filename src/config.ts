@@ -205,9 +205,9 @@ export default class DefaultConfig {
                     let d = require(resolve(join(x, 'db', TableName)))
                     return d.default
                 } catch (e) {
-                    throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
                 }
             }
+            throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
         } else {
             try {
                 let d = require(resolve(join(libs, 'db', TableName)))
