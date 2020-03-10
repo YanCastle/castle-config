@@ -38,8 +38,20 @@ export default class DefaultConfig {
     /**
      * 获取Lib目录
      */
-    getLibPath() {
-        return this._ctx.route && this._ctx.route.Path ? this._ctx.route.Path : this.getAppPath()
+    getLibPath(more: boolean = false) {
+        if (false === more)
+            return this._ctx.route && this._ctx.route.Path ? this._ctx.route.Path : this.getAppPath()
+        else {
+            let lib = [this.getAppPath()]
+            if (this._ctx.route) {
+                if (this._ctx.route.Paths)
+                    lib.unshift(...this._ctx.route.Paths)
+                else {
+                    lib.unshift(this._ctx.route.Path);
+                }
+            }
+            return lib;
+        }
     }
     /**
      * 获取新的SessionID
@@ -149,7 +161,7 @@ export default class DefaultConfig {
      */
     async startTrans(): Promise<Sequelize.Transaction> {
         this._transTimes++;
-        if(this._trans){
+        if (this._trans) {
             return this._trans
         }
         return this._trans = await (await this.getSequelizeDb()).transaction();
@@ -186,11 +198,23 @@ export default class DefaultConfig {
      */
     getDbDefine(TableName: string) {
         //加载文件
-        try {
-            let d = require(resolve(join(this.getLibPath(), 'db', TableName)))
-            return d.default
-        } catch (e) {
-            throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
+        let libs = this.getLibPath(true);
+        if (libs instanceof Array) {
+            for (let x of libs) {
+                try {
+                    let d = require(resolve(join(x, 'db', TableName)))
+                    return d.default
+                } catch (e) {
+                    throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
+                }
+            }
+        } else {
+            try {
+                let d = require(resolve(join(libs, 'db', TableName)))
+                return d.default
+            } catch (e) {
+                throw new Error(`DB_DEFINE_NOT_FOUND:${TableName}`)
+            }
         }
     }
     /**
@@ -234,6 +258,7 @@ export default class DefaultConfig {
      * 生成控制器规则
      */
     async getController(): Promise<RouterPath> {
+        let r = new RouterPath
         if (this._ctx && this._ctx.path) {
             let p = this._ctx.path.split('/');
             if (this._ctx.method == "GET" && extname(this._ctx.path) && !this.Dynamic.includes(p[0])) {
@@ -245,20 +270,17 @@ export default class DefaultConfig {
                 if (p[0].startsWith('_')) {
                     //模块模式
                     let mname = p[0].substr(1);
-                    return this._ctx.route = Object.assign(new RouterPath, {
-                        Controller: p[1],
-                        Method: p.length == 2 ? 'index' : p[2],
-                        Path: this.ModulesMap[mname],
-                        Module: mname
-                    })
+                    r.Controller = p[1];
+                    r.Method = p[2] || 'index';
+                    r.Path = this.ModulesMap[mname];
+                    r.Module = mname;
+                } else {
+                    r.Controller = p[0];
+                    r.Method = p[1] || 'index';
                 }
-                return this._ctx.route = Object.assign(new RouterPath, {
-                    Controller: p[0],
-                    Method: p.length == 1 ? 'index' : p[1],
-                })
             }
         }
-        return this._ctx.route = new RouterPath
+        return this._ctx.route = r
     }
     /**
      * 静态文件处理
@@ -278,7 +300,15 @@ export class RouterPath {
     Module: string = '';
     Method: string = "";
     Controller: string = "";
-    Path: string = "";
+    _path: string = "";
+    get Path() {
+        return this._path
+    }
+    set Path(v: string) {
+        this._path = v;
+        this.Paths.push(v);
+    }
+    Paths: string[] = []
 }
 /**
  * 配置Hook钩子
