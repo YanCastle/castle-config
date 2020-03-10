@@ -1,6 +1,6 @@
 {
   "name": "@ctsy/config",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
@@ -12,8 +12,11 @@
     "yarn.lock",
     "READMD.md"
   ],
-  "scripts": {},
+  "scripts": {
+    "prepublish": "rm -rf dist && tsc"
+  },
   "devDependencies": {
+    "@types/bluebird": "*",
     "@types/koa-send": "*",
     "@types/node": "*",
     "@types/validator": "*"
