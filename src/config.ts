@@ -5,6 +5,7 @@ import { resolve, join, extname } from 'path';
 import { Context } from 'koa';
 import { uuid } from '@ctsy/common';
 import * as send from 'koa-send'
+import hook, { HookWhen } from '@ctsy/hook'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -147,6 +148,7 @@ export default class DefaultConfig {
      * 事务标识
      */
     protected _trans?: Sequelize.Transaction;
+
     get transaction() {
         return this._trans;
     }
@@ -172,12 +174,12 @@ export default class DefaultConfig {
      */
     async commit(): Promise<boolean> {
         this._transTimes--
-        // hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
+        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans && this._transTimes == 0) {
             await this._trans.commit()
             this._trans = undefined;
         }
-        // hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.After, this._ctx, this)
+        hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**
@@ -185,12 +187,12 @@ export default class DefaultConfig {
      */
     async rollback(): Promise<boolean> {
         this._transTimes = 0
-        // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
+        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
         if (this._trans) {
             await this._trans.rollback()
             this._trans == undefined;
         }
-        // hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
+        hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
     /**
@@ -230,7 +232,7 @@ export default class DefaultConfig {
         }
         throw new Error(`NO_PK:${TableName}`)
     }
-    getDbTableFields(TableName: string): Promise<any> {
+    getDbTableFields(TableName: string): Promise<{ [index: string]: { type: any, [index: string]: any } }> {
         return this.getDbDefine(TableName)
     }
     /**
