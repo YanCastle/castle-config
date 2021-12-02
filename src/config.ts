@@ -175,7 +175,7 @@ export default class DefaultConfig {
     async commit(): Promise<boolean> {
         this._transTimes--
         hook.emit(ConfigHooks.COMMIT_TRANS, HookWhen.Before, this._ctx, this)
-        if (this._trans && this._transTimes == 0) {
+        if (this._trans && this._transTimes <= 0) {
             await this._trans.commit()
             this._trans = undefined;
         }
@@ -186,12 +186,12 @@ export default class DefaultConfig {
      * 事务撤销
      */
     async rollback(): Promise<boolean> {
-        this._transTimes = 0
         hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.Before, this._ctx, this)
-        if (this._trans) {
+        if (this._trans && this._transTimes > 0) {
             await this._trans.rollback()
             this._trans == undefined;
         }
+        this._transTimes = 0
         hook.emit(ConfigHooks.ROLLBACK_TRANS, HookWhen.After, this._ctx, this)
         return true;
     }
