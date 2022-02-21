@@ -50,6 +50,9 @@ export default class DefaultConfig {
                 else {
                     lib.unshift(this._ctx.route.Path);
                 }
+                if (this._ctx.route._path) {
+                    lib.unshift(this._ctx.route._path);
+                }
             }
             return lib;
         }
