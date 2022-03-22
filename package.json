@@ -25,6 +25,7 @@
     "@ctsy/common": "*",
     "@ctsy/crypto": "*",
     "@ctsy/hook": "*",
+    "@types/lodash": "^4.14.179",
     "castle-utils": "*",
     "koa-send": "^5.0.1",
     "mysql2": "*",

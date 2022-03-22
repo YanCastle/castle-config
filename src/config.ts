@@ -4,6 +4,7 @@ import * as Sequelize from 'sequelize'
 import { resolve, join, extname } from 'path';
 import { Context } from 'koa';
 import { uuid } from '@ctsy/common';
+import { uniq } from 'lodash'
 import * as send from 'koa-send'
 import hook, { HookWhen } from '@ctsy/hook'
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
@@ -54,7 +55,7 @@ export default class DefaultConfig {
                     lib.unshift(this._ctx.route._path);
                 }
             }
-            return lib;
+            return uniq(lib);
         }
     }
     /**
