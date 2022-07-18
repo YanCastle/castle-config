@@ -1,6 +1,6 @@
 {
   "name": "@ctsy/config",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "repository": "https://github.com/YanCastle/castle-config",
   "author": "yanpengquan",
   "license": "MIT",
@@ -10,14 +10,17 @@
     "dist/**/*.js",
     "dist/**/*.d.ts",
     "yarn.lock",
+    "pb/*",
     "READMD.md"
   ],
   "scripts": {
-    "prepublish": "rm -rf dist && tsc"
+    "prepublishOnly": "rm -rf dist && tsc"
   },
   "devDependencies": {
     "@types/bluebird": "*",
     "@types/koa-send": "*",
+    "@types/lodash": "*",
+    "@types/mz": "*",
     "@types/node": "*",
     "@types/validator": "*"
   },
@@ -25,11 +28,10 @@
     "@ctsy/common": "*",
     "@ctsy/crypto": "*",
     "@ctsy/hook": "*",
-    "@types/lodash": "^4.14.179",
-    "castle-utils": "*",
     "koa-send": "^5.0.1",
     "mysql2": "*",
-    "mz": "*",
+    "mz": "^2.7.0",
+    "protobufjs": "^7.0.0",
     "sequelize": "*"
   }
 }

@@ -3,10 +3,14 @@ import { MD5 } from '@ctsy/crypto'
 import * as Sequelize from 'sequelize'
 import { resolve, join, extname } from 'path';
 import { Context } from 'koa';
+import * as p from 'protobufjs'
 import { uuid } from '@ctsy/common';
 import { uniq } from 'lodash'
 import * as send from 'koa-send'
 import hook, { HookWhen } from '@ctsy/hook'
+import { createReadStream } from 'fs';
+import { ProtoUtils } from './proto';
+const base = p.loadSync(__dirname + '/pb/base.proto').lookupType('base')
 const SequelizeDBs: { [index: string]: Sequelize.Sequelize } = {
 
 }
@@ -123,7 +127,38 @@ export default class DefaultConfig {
      * @param ctx 
      */
     async outcheck(ctx: Context): Promise<any> {
+        if (ctx.method == 'GET' && ctx.path.includes('/proto/')) {
+            ctx.status = 200;
+            ctx.body = createReadStream('.' + ctx.path)
+            ctx.header['Content-Type'] = 'application/json';
+            return ctx.body;
+        }
         // if (!this.sendFile)
+        if (ctx.body !== undefined) {
+            let md5 = ctx.get('md5');
+            if (md5 == MD5.encode(JSON.stringify(ctx.body))) {
+                //减少传输量
+                ctx.status = 206
+                ctx.set('content-type', 'text/js')
+                return ctx.body = '';
+            }
+        }
+        try {
+            let accept = ctx.get('accept')
+            if ((accept.includes('protobuf') || accept.includes('pb')) && undefined != ctx.body) {
+                let proto = await ProtoUtils.load_proto(ctx.route.Module, ctx.route.Controller, ctx.route.Method);
+                let d: any = ctx.body instanceof Array ? { _: ctx.body } : ctx.body;
+                if (proto.fields._m) {
+                    d = { _m: d };
+                }
+                ctx.rbody = ctx.body;
+                ctx.body = await proto.encode(proto.fromObject(d)).finish();
+                ctx.body = await base.encode({ c: ctx.status, d: ctx.body, e: this._ctx.error && this._ctx.error.message ? this._ctx.error.message : (this._ctx.error || "") }).finish();
+                ctx.set('content-type', accept.includes('pb') ? 'pb' : 'application/x-protobuf')
+                return ctx.body;
+            }
+        } catch (error) {
+        }
         return this.sendFile ? undefined : {
             d: this._ctx.body !== undefined ? this._ctx.body : '',
             c: this._ctx.error ? (ctx.status != 200 ? ctx.status : 500) : 200,

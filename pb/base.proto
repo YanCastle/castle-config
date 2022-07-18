@@ -1,0 +1,21 @@
+syntax = "proto3";
+message base {
+    uint64 c = 1;
+    string e = 2;
+    bytes d=3;
+}
+message SearchResult {
+    uint64 P = 1;
+    uint64 N = 2;
+    uint64 T = 3;
+    bytes R=4;
+    bytes L=5;
+}
+
+message SearchWhere {
+    uint64 P = 1;
+    uint64 N = 2;
+    string Keyword = 3;
+    string Sort = 4;
+    bytes W=5;
+}
